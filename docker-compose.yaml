@@ -1,0 +1,84 @@
+version: '3.8'
+volumes:
+ electradrive:
+
+services:
+  pos-db:
+    container_name: 'pos-db'
+    image: mysql:latest
+    volumes:
+      - ./init_scripts:/docker-entrypoint-initdb.d    
+    environment:
+      MYSQL_ROOT_PASSWORD: 12345
+    ports:
+      - "3306:3306"
+    restart: always
+
+  pos-backend:
+    container_name: 'pos-backend'
+    image: bjand49/dls-pos-backend:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - pos-db
+    environment:
+      MYSQL_HOST: host.docker.internal:3306/electradrive
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 12345
+      MYSQL_ROOT_PASSWORD: 12345
+    restart: always
+
+    ports:
+      - "8080:8080"
+
+  pos-frontend:
+    container_name: 'pos-frontend'
+    image: bjand49/dls-pos-frontend:latest
+    ports:
+      - 80:80
+    restart: always
+
+  rabbitMQ:
+    image: rabbitmq:3-management
+    container_name: 'RabbitMQ'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_USER: "guest"
+      RABBITMQ_DEFAULT_PASS: "guest"
+    restart: always
+
+  carstorage-db:
+    image: postgres
+    container_name: local_pgdb
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: guest
+      POSTGRES_PASSWORD: guest
+      POSTGRES_CONFIG: |
+        listen_addresses = '*'
+
+  carstorage-api: 
+    image: bjand49/dls-carstorage:latest
+    container_name: 'dls-carstorage'
+    ports:
+      - 7003:7003
+    depends_on:
+      - carstorage-db
+    restart: always
+    environment:
+      HOST: "host.docker.internal"
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4_container
+    restart: always
+    ports:
+      - "8888:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
+      PGADMIN_DEFAULT_PASSWORD: strong-password
