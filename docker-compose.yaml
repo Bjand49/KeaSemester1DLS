@@ -11,7 +11,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 12345
     ports:
-      - "3306:3306"
+      - "3307:3306"
     restart: always
 
   pos-backend:
@@ -23,7 +23,7 @@ services:
     depends_on:
       - pos-db
     environment:
-      MYSQL_HOST: host.docker.internal:3306/electradrive
+      MYSQL_HOST: host.docker.internal:3307/electradrive
       MYSQL_USER: root
       MYSQL_PASSWORD: 12345
       MYSQL_ROOT_PASSWORD: 12345
