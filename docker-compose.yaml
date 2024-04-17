@@ -61,6 +61,9 @@ services:
       POSTGRES_PASSWORD: guest
       POSTGRES_CONFIG: |
         listen_addresses = '*'
+    extra_hosts:
+      - "host.docker.internal:192.168.1.10" 
+      - "host.docker.internal:10.136.137.74" 
 
   carstorage-api: 
     image: bjand49/dls-carstorage:latest
@@ -72,7 +75,7 @@ services:
     restart: always
     environment:
       HOST: "host.docker.internal"
-
+    
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
