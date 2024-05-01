@@ -14,6 +14,16 @@ services:
       - "3307:3306"
     restart: always
 
+  carstorage-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: local_mssql
+    restart: always
+    ports:
+      - "1433:1433"
+    environment:
+      MSSQL_SA_PASSWORD: "yourStrong(!)Password"
+      ACCEPT_EULA: "Y"
+
   pos-backend:
     container_name: 'pos-backend'
     image: bjand49/dls-pos-backend:latest
@@ -49,21 +59,6 @@ services:
       RABBITMQ_DEFAULT_PASS: "guest"
     restart: always
 
-  carstorage-db:
-    image: postgres
-    container_name: local_pgdb
-    restart: always
-    ports:
-      - "5432:5432"
-    environment:
-      POSTGRES_USER: guest
-      POSTGRES_PASSWORD: guest
-      POSTGRES_CONFIG: |
-        listen_addresses = '*'
-    extra_hosts:
-      - "host.docker.internal:192.168.1.10" 
-      - "host.docker.internal:10.136.137.74" 
-
   carstorage-api: 
     image: bjand49/dls-carstorage:latest
     container_name: 'dls-carstorage'
@@ -74,17 +69,7 @@ services:
     restart: always
     environment:
       HOST: "host.docker.internal"
-    
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin4_container
-    restart: always
-    ports:
-      - "8888:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: user-name@domain-name.com
-      PGADMIN_DEFAULT_PASSWORD: strong-password
-  
+     
   assembly-line:
     image: bjand49/dls-assembly-line:latest
     container_name: 'dls-assembly-line'
@@ -95,10 +80,10 @@ services:
       HOST: "host.docker.internal"
 
   part-storage:
-    image: bjand49/dls-part-storage:latest
-    container_name: 'dls-part-storage'
+    image: bjand49/dls-parts-storage:latest
+    container_name: 'dls-parts-storage'
     ports:
-      - 3000:3000
+      - 8111:8111
     restart: always
     environment:
       HOST: "host.docker.internal"
@@ -107,6 +92,16 @@ services:
     image: bjand49/dls-pos-carstorage-indexer:latest
     container_name: carstorage-indexer
     restart: always
+    depends_on:
+      - pos-db
+
+    environment:
+      DB_CONNECTION_STRING: "server=host.docker.internal;port=3307;uid=root;pwd=12345;database=carstorage"
+      DB_USER: "guest"
+      DB_PASS: "12345"
+      MQ_HOSTNAME: "host.docker.internal"
+      MQ_USER: "guest"
+      MQ_PASS: "guest"
 
 
 
