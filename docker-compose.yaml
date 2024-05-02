@@ -102,6 +102,9 @@ services:
       MQ_HOSTNAME: "host.docker.internal"
       MQ_USER: "guest"
       MQ_PASS: "guest"
+    ports:
+      - 42069:8080
+      - 42070:8081
 
 
 
