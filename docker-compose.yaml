@@ -88,20 +88,6 @@ services:
     environment:
       HOST: "host.docker.internal"
 
-  carstorage-indexer:
-    image: bjand49/dls-pos-carstorage-indexer:latest
-    container_name: carstorage-indexer
-    restart: always
-    depends_on:
-      - pos-db
-
-    environment:
-      DB_CONNECTION_STRING: "server=host.docker.internal;port=3307;uid=root;pwd=12345;database=carstorage"
-      DB_USER: "guest"
-      DB_PASS: "12345"
-      MQ_HOSTNAME: "host.docker.internal"
-      MQ_USER: "guest"
-      MQ_PASS: "guest"
 
 
 
