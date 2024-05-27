@@ -47,6 +47,10 @@ services:
     ports:
       - 80:80
     restart: always
+    environment:
+      VITE_BACKEND_SALE_URL: http://host.docker.internal:8080/api/sales/submit
+      VITE_APP_BACKEND_GET_CAR_URL: http://host.docker.internal:8080/api/cars/
+
 
   rabbitMQ:
     image: rabbitmq:3-management
@@ -63,7 +67,8 @@ services:
     image: bjand49/dls-carstorage:latest
     container_name: 'dls-carstorage'
     ports:
-      - 7003:7003
+      - 7003:8080
+      - 7004:8081
     depends_on:
       - carstorage-db
     restart: always
@@ -96,7 +101,7 @@ services:
       - pos-db
 
     environment:
-      DB_CONNECTION_STRING: "server=host.docker.internal;port=3307;uid=root;pwd=12345;database=carstorage"
+      DB_CONNECTION_STRING: "server=host.docker.internal;port=3307;uid=root;pwd=12345;database=carstorage;Allow User Variables=True"
       DB_USER: "guest"
       DB_PASS: "12345"
       MQ_HOSTNAME: "host.docker.internal"
